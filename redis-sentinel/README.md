@@ -1,5 +1,5 @@
 # REDIS high-availability using sentinel
-Original source code at https://github.com/Developers-Notebook/Redis-Sentinel-Docker-Compose and more information at https://www.developers-notebook.com/development/using-redis-sentinel-with-docker-compose
+Original source code at https://github.com/Developers-Notebook/Redis-Sentinel-Docker-Compose
 
 - Added rabbitmq.conf to support persistency using disk
 - Added our custom labels (used in Dashboard to group containers)
