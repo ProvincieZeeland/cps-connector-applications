@@ -6,7 +6,7 @@ The API can be found at https://github.com/ProvincieZeeland/cps-connector, this 
 - [Dashboard](url)
 - [Docker proxy](url)
 - [Elasticsearch](url)
-- [Proxy (Nginx)(url)
+- [Nginx proxy (url)
 - [RabbitMQ](url)
 - [Redis](url)
 - [Uptime Kuma](url)
