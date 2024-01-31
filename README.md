@@ -4,12 +4,13 @@ The CPS-connector is set of Docker containers used for updating our Elasticsearc
 The API can be found at https://github.com/ProvincieZeeland/cps-connector, this repository contains all used applications:
 
 - [Dashboard](url)
-- [Docker proxy](url)
-- [Elasticsearch](url)
-- [Nginx proxy](url)
-- [RabbitMQ](url)
-- [Redis](url)
-- [Uptime Kuma](url)
+- [Docker proxy](https://github.com/Tecnativa/docker-socket-proxy)
+- [Elasticsearch](https://www.elastic.co/elasticsearch)
+- [Nginx proxy](https://www.nginx.com/)
+- [RabbitMQ](https://rabbitmq.com/)
+- [Redis](https://redis.com/)
+- [Uptime Kuma](https://uptime.kuma.pet/)
+  
   
 
 
