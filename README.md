@@ -3,7 +3,7 @@ The CPS-connector is set of Docker containers used for updating our Elasticsearc
 
 The API can be found at https://github.com/ProvincieZeeland/cps-connector, this repository contains all used applications:
 
-- [Dashboard](url)
+- Dashboard
 - [Docker proxy](https://github.com/Tecnativa/docker-socket-proxy)
 - [Elasticsearch](https://www.elastic.co/elasticsearch)
 - [Nginx proxy](https://www.nginx.com/)
