@@ -17,7 +17,7 @@ Copy the ```env-example``` file to ```.env``` and setup the variables. The insta
 When the ```es-db``` and the ```es-kibana``` containers both are running use Kibana to setup indices etc, browse to http://localhost:5601/ and login with user elastic and the password specified in de ```.env``` file. Click the hamburger-menu (top-left) and browse all the way down to Management / Dev tools which starts a console.
 
 ## Setup indices
-Open the ```indices-setup.txt``` file, copy the contents, paste it into the console in the Kibana window. After executing the commands you should have 6 indices (see  Management / Stack management / Index management)
+Open the ```indices-setup.txt``` file, copy the contents, paste it into the console in the Kibana window. After executing the commands you should have 6 indices (see  Management / Stack management / Index management). Note: the yellow health status is due to using only one node.
 ![Schermafbeelding 2024-02-01 om 17 41 46](https://github.com/ProvincieZeeland/cps-connector-applications/assets/196572/0e6fecf3-024f-4007-8679-3d30c6deea1a)
 
 ## Snapshots (backup)
