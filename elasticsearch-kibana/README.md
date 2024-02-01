@@ -17,7 +17,15 @@ Copy the ```env-example``` file to ```.env``` and setup the variables. The insta
 When the ```es-db``` and the ```es-kibana``` containers both are running use Kibana to setup indices etc, browse to http://localhost:5601/ and login with user elastic and the password specified in de ```.env``` file. Click the hamburger-menu (top-left) and browse all the way down to Management / Dev tools which starts a console.
 
 - Open the ```indices-setup.txt``` file, copy the contents and paste it into the console in the Kibana window.
-- 
+
+
+## Snapshots (backup)
+Backup for Elasticsearch is done using snapshots, open ```snapshot-setup.txt``` and copy/paste the contents into the Kibana console.
+It creates 2 snapshot repo's (ACC and PROD) and uses SLM (Snapshot Lifecycle Management) to automate the nightly updates. After executing the commands browse to Management / Stack management and click Snapshot and restore / Respositories. The screen should look like this:
+![Schermafbeelding 2024-02-01 om 17 34 15](https://github.com/ProvincieZeeland/cps-connector-applications/assets/196572/fbaac1d6-8187-44e1-a170-53f241312ded)
+
+
+
 
 
 
