@@ -3,8 +3,8 @@
 # Setup for Elasticsearch indices/mappings for an ACC and PROD environment
 # Use KIBANA devtools / console
 #
-# versie:            0.2
-# Laatste wijziging: 31/10/2023 
+# versie:            0.7
+# Laatste wijziging: 01/02/2024 
 #
 
 

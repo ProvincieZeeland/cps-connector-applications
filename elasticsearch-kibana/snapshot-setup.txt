@@ -44,17 +44,6 @@ PUT _snapshot/cdn_prod
 }
 
 ##
-# Example for creating a manual snapshot
-# 
-PUT _snapshot/cdn_acc/20231031
-{
-  "indices": "cdn_zeeland_acc",
-  "ignore_unavailable": "true",
-  "include_global_state": false,
-  "partial": true
-}
-
-##
 # Use SLM (Snapshot Lifecycle Management) to automagically run scheduled snapshots
 # Also available in Kibana  
 #
@@ -88,4 +77,15 @@ PUT _slm/policy/nightly-snapshots-prod
     "min_count": 5,
     "max_count": 50
   }
+}
+
+##
+# Example for creating a manual snapshot
+# 
+PUT _snapshot/cdn_acc/20231031
+{
+  "indices": "cdn_zeeland_acc",
+  "ignore_unavailable": "true",
+  "include_global_state": false,
+  "partial": true
 }
