@@ -1,0 +1,18 @@
+# Admin credentials
+RABBIT_USER=admin
+RABBIT_PASS=admin
+
+# Base path (each node has it's own subdir)
+RABBIT_DATA_PATH=./data
+
+# shared cookie
+RABBIT_COOKIE=shared-cookie
+
+# settings for the make file
+RABBIT_SERVER=http://localhost:15672
+ACC_USER=
+ACC_PASS=
+ACC_VHOST=
+PROD_USER=
+PROD_PASS=
+PROD_VHOST=

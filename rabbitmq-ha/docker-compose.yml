@@ -1,0 +1,109 @@
+version: "2"
+
+services:
+    rabbit1:
+        image: rabbitmq:3-management
+        container_name: rabbit1
+        hostname: rabbit1
+        networks:
+          - rabbit         
+        env_file:
+          - ./.env            
+        environment:
+          - RABBITMQ_ERLANG_COOKIE=${RABBIT_COOKIE}
+          - RABBITMQ_DEFAULT_USER=${RABBIT_USER}
+          - RABBITMQ_DEFAULT_PASS=${RABBIT_PASS}
+        labels:
+          cps.stack: RabbitMQ 
+          cps.name: "RabbitMQ node 1"
+          cps.env: "Global"            
+        volumes:
+          - $PWD/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+          - ${RABBIT_DATA_PATH}/rabbit1-data:/var/lib/rabbitmq
+        security_opt:
+          - no-new-privileges:true
+        restart: unless-stopped
+        healthcheck:
+          test: rabbitmq-diagnostics -q ping
+          interval: 5s
+          timeout: 15s
+          retries: 3
+        logging:
+          driver: "json-file"
+          options:
+            max-file: 5
+            max-size: 15m                    
+
+    rabbit2:
+        image: rabbitmq:3-management
+        container_name: rabbit2
+        hostname: rabbit2
+        networks:
+          - rabbit        
+        env_file:
+          - ./.env                        
+        environment:
+          - RABBITMQ_ERLANG_COOKIE=${RABBIT_COOKIE}
+          - RABBITMQ_DEFAULT_USER=${RABBIT_USER}
+          - RABBITMQ_DEFAULT_PASS=${RABBIT_PASS}            
+        labels:
+          cps.stack: RabbitMQ 
+          cps.name: "RabbitMQ node 2"
+          cps.env: "Global"                     
+        volumes:
+          - $PWD/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+          - ${RABBIT_DATA_PATH}/rabbit2-data:/var/lib/rabbitmq
+        command: sh -c 'sleep 5 && rabbitmq-server'
+        security_opt:
+          - no-new-privileges:true
+        restart: unless-stopped
+        healthcheck:
+          test: rabbitmq-diagnostics -q ping
+          interval: 5s
+          timeout: 15s
+          retries: 3
+        logging:
+          driver: "json-file"
+          options:
+            max-file: 5
+            max-size: 15m        
+
+    haproxy:
+        image: haproxy:1.7
+        container_name: rabbit-cluster
+        labels:
+          cps.stack: RabbitMQ 
+          cps.name: "HA Proxy load balancer"
+          cps.env: "Global"                 
+        volumes:
+          - $PWD/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+        #
+        # if using the redis insight docker container use the following cfg
+        #  
+        #  - $PWD/haproxy.cfg:/usr/local/etc/haproxy/haproxy_redis-insight.cfg:ro
+        depends_on:
+          - rabbit1
+          - rabbit2
+        ports:
+          - 15672:15672
+          - 5672:5672    
+          - 8404:8404
+        networks:
+          - cps_acc
+          - cps_prod          
+          - rabbit
+        logging:
+          driver: "json-file"
+          options:
+            max-file: 5
+            max-size: 15m          
+
+networks:
+  cps_acc:
+     external: true
+  cps_prod:
+     external: true             
+  rabbit:
+     external: true 
+
+    
