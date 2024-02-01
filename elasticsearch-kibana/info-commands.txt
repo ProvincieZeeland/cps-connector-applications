@@ -1,0 +1,85 @@
+##
+# Some handy commands for Kibana devtools console
+#
+# versie:            0.2
+# Laatste wijziging: 31/10/2023
+#
+
+# CLUSTER / NODE INFO
+GET /_cluster/health
+GET /_cluster/stats
+GET _nodes/?pretty
+
+# All known mappings
+GET _mapping
+
+# SLM (snapshots) policy
+GET _slm/policy
+
+# Snapshot info
+GET _snapshot/<snapshot repo>/<snapshot name>/_status
+
+# Get items from an index
+GET cdn_zeeland_acc/_search
+{
+  "query": 
+  {
+    "match_all": {}
+  }
+} 
+
+# Get items from an index but sorted and only a subset of fields
+GET cdn_zeeland_acc_transactions/_search
+{
+  "query": 
+  {
+    "match_all": {}
+  },
+  "_source": 
+  {
+    "includes": ["object_id", "action_requested", "http_response_code","transaction_stamp", "transaction_source", "transaction_data.last_error", "headers.X-Real-Ip", "transaction_data.total_time"]
+  },
+  "sort": [{"transaction_stamp": {"order": "desc"}}]
+}
+
+# Get items matching multiple values
+GET cdn_zeeland_acc_transactions/_search
+{
+  "query": {
+      "bool": {
+        "must": [
+          {
+            "match": {
+              "object_id": "ZLD2023-120"
+            }
+          },
+          {
+            "bool": 
+            {
+              "must": 
+              [
+                {"match_phrase": {"http_response_code": 200}}, 
+                {"match_phrase": {"action_requested": "delete"}}
+              ]
+            }
+          }
+        ]
+      }
+    },
+  "_source": ["object_id", "action_requested", "http_response_code","transaction_stamp", "transaction_source", "last_error"],
+  "sort": [{"transaction_stamp": {"order": "desc"}}]}
+}
+
+
+# Analysers
+GET cdn_zeeland_acc_v2/_analyze
+{
+  "text": "Dit is een testje voor de analyser",
+  "analyzer": "ngram_analyzer"
+}
+
+GET cdn_zeeland_acc_v2/_analyze
+{
+  "text": "Dit is een testje voor de analyser",
+  "analyzer": "standard_with_nl_stopwords"
+}

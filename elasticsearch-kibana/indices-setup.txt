@@ -1,0 +1,315 @@
+#####
+#
+# Setup for Elasticsearch indices/mappings for an ACC and PROD environment
+# Use KIBANA devtools / console
+#
+# versie:            0.2
+# Laatste wijziging: 31/10/2023 
+#
+
+
+##
+# DELETE existing indices/mappings
+#
+DELETE cdn_zeeland_acc
+DELETE cdn_zeeland_acc_transactions
+DELETE cdn_zeeland_acc_auth
+
+DELETE cdn_zeeland_prod
+DELETE cdn_zeeland_prod_transactions
+DELETE cdn_zeeland_prod_auth
+
+
+##
+# CREATE indices/mappings
+#
+PUT cdn_zeeland_acc
+PUT cdn_zeeland_acc_transactions
+PUT cdn_zeeland_acc_auth
+
+PUT cdn_zeeland_prod
+PUT cdn_zeeland_prod_transactions
+PUT cdn_zeeland_prod_auth
+
+
+############################## ACCEPTANCE ################################
+
+##
+# CREATE data index mapping
+#
+PUT cdn_zeeland_acc/_mappings
+{
+    "properties" : 
+    {
+        "object_id":        {"type": "keyword"},
+        "created":          {"type" : "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+                             "ignore_malformed": true
+                            },
+        "modified":         {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+			                       "ignore_malformed": true
+                            },
+        "source_created":   {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+			                       "ignore_malformed": true  
+                            },
+        "source_modified":  {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+                             "ignore_malformed": true
+                            },
+        "publication_date": {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+                             "ignore_malformed": true
+                            },
+        "archive_date":    {"type": "date",
+                            "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",  
+				                    "ignore_malformed": true                                  
+				                   },  
+        "mime_type":        {"type": "text", "norms": false},
+        "filename":         {"type": "text", "norms": false},
+        "fileextension":    {"type": "keyword"},
+        "content":          {"type": "text"},
+        "author":           {"type": "text", "copy_to": "sayt_author"},
+        "title":            {"type": "text", "copy_to": "sayt_title"},
+        "document_type":    {"type": "keyword", "norms": false},
+        "zeester_type":     {"type": "keyword", "norms": false},
+        "zeester_ref":      {"type": "keyword", "norms": false},
+        "retention":        {"type": "integer"},
+        "classification":   {"type": "keyword", "norms": false},
+        "sayt_title":       {"type": "search_as_you_type"},
+        "sayt_author":      {"type": "search_as_you_type"},
+        "document_metadata":{"type": "nested",
+                             "properties": {"pages":           {"type": "integer"},
+                                            "size":            {"type": "integer"},
+                                            "crc":             {"type": "text"}
+                                           }
+                            }        
+    
+    }
+}
+
+
+##
+# CLOSE index for modifications
+#
+POST cdn_zeeland_acc/_close
+
+
+##
+# Analysers
+#
+PUT cdn_zeeland_acc/_settings
+{
+  "analysis": 
+  {
+      "filter": {
+        "ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 15
+        }
+      },
+      "analyzer": {"ngram_analyzer":
+                    {
+                     "type": "custom",
+                     "tokenizer": "standard",
+                     "filter": ["lowercase", "ngram_filter"]
+                    },
+                   "standard_with_nl_stopwords":
+                    {
+                     "type":"standard",
+                     "stopwords":"_dutch_"
+                    }
+      }
+    }
+}
+
+
+##
+# Refresh interval 
+#
+PUT cdn_zeeland_acc/_settings
+{
+  "index":
+  {
+    "refresh_interval": "30s"
+  }
+}
+
+##
+# RE-OPEN the index
+#
+POST cdn_zeeland_acc/_open
+
+
+##
+#  CREATE transaction mapping
+#
+PUT cdn_zeeland_acc_transactions/_mappings
+{
+  "properties":
+  {
+    "object_id"          : {"type" : "text"},
+    "transaction_stamp"  : {"type" : "date", "format" : "epoch_millis"},
+    "action_requested"   : {"type" : "text"},
+    "http_response_code" : {"type": "integer"},
+    "transaction_data"   : {"type" : "object", "enabled" :false}
+  }
+}
+
+
+##
+#  CREATE authentication error mapping
+#
+PUT cdn_zeeland_acc_auth/_mappings
+{
+  "properties":
+  {
+    "request"             : {"type" : "text"},
+    "auth_stamp"          : {"type" : "date", "format" : "epoch_millis"},
+    "auth_response_code"  : {"type": "integer"},
+    "authentication_data" : {"type" : "object", "enabled" :false}
+  }
+}
+
+############################## PRODUCTION ################################
+
+##
+# CREATE data index mapping
+#
+PUT cdn_zeeland_prod/_mappings
+{
+    "properties" : 
+    {
+        "object_id":        {"type": "keyword"},
+        "created":          {"type" : "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+                             "ignore_malformed": true
+                            },
+        "modified":         {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+			                       "ignore_malformed": true
+                            },
+        "source_created":   {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+			                       "ignore_malformed": true  
+                            },
+        "source_modified":  {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+                             "ignore_malformed": true
+                            },
+        "publication_date": {"type": "date",
+                             "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",
+                             "ignore_malformed": true
+                            },
+        "archive_date":    {"type": "date",
+                            "format" : "date_optional_time||strict_date_optional_time||yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss a||yyyy-MM-dd HH:mm:ss||M/dd/yyyy HH:mm:ss a||MM/dd/yyyy HH:mm:ss||MM/dd/yyyy HH:mm:ss a||yyyy-MM-dd||epoch_millis",  
+				                    "ignore_malformed": true                                  
+				                   },  
+        "mime_type":        {"type": "text", "norms": false},
+        "filename":         {"type": "text", "norms": false},
+        "fileextension":    {"type": "keyword"},
+        "content":          {"type": "text"},
+        "author":           {"type": "text", "copy_to": "sayt_author"},
+        "title":            {"type": "text", "copy_to": "sayt_title"},
+        "document_type":    {"type": "keyword", "norms": false},
+        "zeester_type":     {"type": "keyword", "norms": false},
+        "zeester_ref":      {"type": "keyword", "norms": false},
+        "retention":        {"type": "integer"},
+        "classification":   {"type": "keyword", "norms": false},
+        "sayt_title":       {"type": "search_as_you_type"},
+        "sayt_author":      {"type": "search_as_you_type"},
+        "document_metadata":{"type": "nested",
+                             "properties": {"pages":           {"type": "integer"},
+                                            "size":            {"type": "integer"},
+                                            "crc":             {"type": "text"}
+                                           }
+                            }        
+    
+    }
+}
+
+
+##
+# CLOSE index for modifications
+#
+POST cdn_zeeland_prod/_close
+
+
+##
+# Analysers
+#
+PUT cdn_zeeland_prod/_settings
+{
+  "analysis": 
+  {
+      "filter": {
+        "ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 15
+        }
+      },
+      "analyzer": {"ngram_analyzer":
+                    {
+                     "type": "custom",
+                     "tokenizer": "standard",
+                     "filter": ["lowercase", "ngram_filter"]
+                    },
+                   "standard_with_nl_stopwords":
+                    {
+                     "type":"standard",
+                     "stopwords":"_dutch_"
+                    }
+      }
+    }
+}
+
+
+##
+# Refresh interval 
+#
+PUT cdn_zeeland_prod/_settings
+{
+  "index":
+  {
+    "refresh_interval": "30s"
+  }
+}
+
+##
+# RE-OPEN the index
+#
+POST cdn_zeeland_prod/_open
+
+
+##
+#  CREATE transaction mapping
+#
+PUT cdn_zeeland_prod_transactions/_mappings
+{
+  "properties":
+  {
+    "object_id"          : {"type" : "text"},
+    "transaction_stamp"  : {"type" : "date", "format" : "epoch_millis"},
+    "action_requested"   : {"type" : "text"},
+    "http_response_code" : {"type": "integer"},
+    "transaction_data"   : {"type" : "object", "enabled" :false}
+  }
+}
+
+
+##
+#  CREATE authentication error mapping
+#
+PUT cdn_zeeland_prod_auth/_mappings
+{
+  "properties":
+  {
+    "request"             : {"type" : "text"},
+    "auth_stamp"          : {"type" : "date", "format" : "epoch_millis"},
+    "auth_response_code"  : {"type": "integer"},
+    "authentication_data" : {"type" : "object", "enabled" :false}
+  }
+}

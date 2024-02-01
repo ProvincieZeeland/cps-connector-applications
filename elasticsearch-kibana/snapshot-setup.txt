@@ -1,0 +1,91 @@
+#####
+#
+# Example setup for Elasticsearch snapshots (backup/restore) for an ACC and PROD environment
+# Use KIBANA devtools / console
+#
+# versie:            0.2
+# Laatste wijziging: 31/10/2023 
+#
+
+##
+# DELETE existing snapshots
+#
+DELETE _snapshot {"indices": "cdn_zeeland_acc}
+DELETE _snapshot {"indices": "cdn_zeeland_prod}
+
+
+##
+# CREATE snapshot repositories
+# 
+# Note: make sure the location setting points to an existing map 
+#       we're using a Docker volume mount to a local map 
+#
+
+PUT _snapshot/cdn_acc
+{
+  "type": "fs",
+  "settings": 
+  {
+    "location": "/usr/share/elasticsearch/snapshots",
+    "compress": true,
+    "chunk_size": "10m"
+  }
+}
+
+PUT _snapshot/cdn_prod
+{
+  "type": "fs",
+  "settings": 
+  {
+    "location": "/usr/share/elasticsearch/snapshots",
+    "compress": true,
+    "chunk_size": "10m"
+  }
+}
+
+##
+# Example for creating a manual snapshot
+# 
+PUT _snapshot/cdn_acc/20231031
+{
+  "indices": "cdn_zeeland_acc",
+  "ignore_unavailable": "true",
+  "include_global_state": false,
+  "partial": true
+}
+
+##
+# Use SLM (Snapshot Lifecycle Management) to automagically run scheduled snapshots
+# Also available in Kibana  
+#
+PUT _slm/policy/nightly-snapshots-acc
+{
+  "schedule": "0 30 1 * * ?",       
+  "name": "<nightly-snap-acc-{now/d}>", 
+  "repository": "cdn_acc",    
+  "config": {
+    "indices": "*",                 
+    "include_global_state": true    
+  },
+  "retention": {                    
+    "expire_after": "5d",
+    "min_count": 5,
+    "max_count": 50
+  }
+}
+
+PUT _slm/policy/nightly-snapshots-prod
+{
+  "schedule": "1 30 1 * * ?",       
+  "name": "<nightly-snap-prod-{now/d}>", 
+  "repository": "cdn_prod",    
+  "config": {
+    "indices": "*",                 
+    "include_global_state": true    
+  },
+  "retention": {                    
+    "expire_after": "5d",
+    "min_count": 5,
+    "max_count": 50
+  }
+}
