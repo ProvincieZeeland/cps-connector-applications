@@ -1,0 +1,7 @@
+certs-available/*.pem
+certs-available/*.cer
+certs-available/*.key
+certs-enabled/*.pem  
+certs-enabled/*.cer
+certs-enabled/*.key
+sites-enabled/*
