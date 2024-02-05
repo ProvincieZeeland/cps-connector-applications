@@ -28,8 +28,8 @@ It creates 2 snapshot repo's (ACC and PROD) and uses SLM (Snapshot Lifecycle Man
 # Client authentication
 Besides the username / password we also use a SHA256 hash to connect, the has can be obtained using following commands:
 
-```docker exec -it es-db /bin/bash```
-```openssl s_client -connect localhost:9200 -servername localhost -showcerts </dev/null 2>/dev/null | openssl x509 -fingerprint -sha256 -noout -in /dev/stdin```
+- ```docker exec -it es-db /bin/bash```
+- ```openssl s_client -connect localhost:9200 -servername localhost -showcerts </dev/null 2>/dev/null | openssl x509 -fingerprint -sha256 -noout -in /dev/stdin```
 
 Save the hash for later usage when configuring the API.
 
