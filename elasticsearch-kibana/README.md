@@ -25,6 +25,14 @@ Backup for Elasticsearch is done using snapshots, open ```snapshot-setup.txt``` 
 It creates 2 snapshot repo's (ACC and PROD) and uses SLM (Snapshot Lifecycle Management) to automate the nightly updates. After executing the commands browse to Management / Stack management and click Snapshot and restore / Policies. The screen should look like this:
 ![Schermafbeelding 2024-02-01 om 17 34 15](https://github.com/ProvincieZeeland/cps-connector-applications/assets/196572/fbaac1d6-8187-44e1-a170-53f241312ded)
 
+# Client authentication
+Besides the username / password we also use a SHA256 hash to connect, the has can be obtained using following commands:
+
+```docker exec -it es-db /bin/bash```
+```openssl s_client -connect localhost:9200 -servername localhost -showcerts </dev/null 2>/dev/null | openssl x509 -fingerprint -sha256 -noout -in /dev/stdin```
+
+Save the hash for later usage when configuring the API.
+
 For now you're all done.
 
 
