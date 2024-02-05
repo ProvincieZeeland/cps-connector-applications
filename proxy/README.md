@@ -11,6 +11,6 @@ NGINX is used as a reverse proxy to expose TCP ports from within the Docker appl
 
 - Copy example.conf to sites-enabled and configure with correct domain.
 - Copy certificates to certs-enabled.
-- Start using docker compose up --build (with optional -d to start in detached mode).
+- Start using ```docker compose up --build``` (with optional -d to start in detached mode).
 
 
